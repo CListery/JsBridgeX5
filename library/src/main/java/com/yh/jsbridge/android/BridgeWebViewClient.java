@@ -10,6 +10,7 @@ import com.yh.jsbridge.Message;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.ArrayList;
 
 /**
  * 如果要自定义WebViewClient必须要集成此类
@@ -79,12 +80,9 @@ public class BridgeWebViewClient extends WebViewClient {
             BridgeUtil.webViewLoadLocalJs(view, BridgeWebView.toLoadJs);
         }
 
-        //
-        if (webView.getStartupMessage() != null) {
-            for (Message m : webView.getStartupMessage()) {
-                webView.dispatchMessage(m);
-            }
-            webView.setStartupMessage(null);
+        for (Message m : new ArrayList<>(webView.getStartupMsg())) {
+            webView.dispatchMessage(m);
         }
+        webView.clearStartupMsg();
     }
 }

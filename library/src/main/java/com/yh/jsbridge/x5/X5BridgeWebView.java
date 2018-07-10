@@ -8,7 +8,6 @@ import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 
-import com.tencent.smtt.sdk.WebChromeClient;
 import com.tencent.smtt.sdk.WebView;
 import com.yh.jsbridge.BridgeHandler;
 import com.yh.jsbridge.CallBackFunction;
@@ -28,18 +27,18 @@ public class X5BridgeWebView extends WebView implements WebViewJavascriptBridge 
     private final String TAG = "BridgeWebView";
 
     public static final String toLoadJs = "WebViewJavascriptBridge.js";
-    Map<String, CallBackFunction> responseCallbacks = new HashMap<String, CallBackFunction>();
-    Map<String, BridgeHandler> messageHandlers = new HashMap<String, BridgeHandler>();
+    Map<String, CallBackFunction> responseCallbacks = new HashMap<>();
+    Map<String, BridgeHandler> messageHandlers = new HashMap<>();
     BridgeHandler defaultHandler = new DefaultHandler();
 
-    private List<Message> startupMessage = new ArrayList<Message>();
+    private List<Message> mStartupMessage = new ArrayList<>();
 
-    public List<Message> getStartupMessage() {
-        return startupMessage;
+    public List<Message> getStartupMsg() {
+        return mStartupMessage;
     }
 
-    public void setStartupMessage(List<Message> startupMessage) {
-        this.startupMessage = startupMessage;
+    public void clearStartupMsg() {
+        mStartupMessage.clear();
     }
 
     private long uniqueId = 0;
@@ -115,15 +114,7 @@ public class X5BridgeWebView extends WebView implements WebViewJavascriptBridge 
         if (!TextUtils.isEmpty(handlerName)) {
             m.setHandlerName(handlerName);
         }
-        queueMessage(m);
-    }
-
-    private void queueMessage(Message m) {
-        if (startupMessage != null) {
-            startupMessage.add(m);
-        } else {
-            dispatchMessage(m);
-        }
+        mStartupMessage.add(m);
     }
 
     void dispatchMessage(Message m) {
@@ -174,7 +165,7 @@ public class X5BridgeWebView extends WebView implements WebViewJavascriptBridge 
                                         Message responseMsg = new Message();
                                         responseMsg.setResponseId(callbackId);
                                         responseMsg.setResponseData(data);
-                                        queueMessage(responseMsg);
+                                        mStartupMessage.add(responseMsg);
                                     }
                                 };
                             } else {

@@ -26,18 +26,18 @@ public class BridgeWebView extends WebView implements WebViewJavascriptBridge {
 	private final String TAG = "BridgeWebView";
 
 	public static final String toLoadJs = "WebViewJavascriptBridge.js";
-	Map<String, CallBackFunction> responseCallbacks = new HashMap<String, CallBackFunction>();
-	Map<String, BridgeHandler> messageHandlers = new HashMap<String, BridgeHandler>();
+	Map<String, CallBackFunction> responseCallbacks = new HashMap<>();
+	Map<String, BridgeHandler> messageHandlers = new HashMap<>();
 	BridgeHandler defaultHandler = new DefaultHandler();
 
-	private List<Message> startupMessage = new ArrayList<Message>();
+	private List<Message> mStartupMessage = new ArrayList<>();
 
-	public List<Message> getStartupMessage() {
-		return startupMessage;
+	public List<Message> getStartupMsg() {
+		return mStartupMessage;
 	}
 
-	public void setStartupMessage(List<Message> startupMessage) {
-		this.startupMessage = startupMessage;
+	public void clearStartupMsg(){
+		mStartupMessage.clear();
 	}
 
 	private long uniqueId = 0;
@@ -125,19 +125,7 @@ public class BridgeWebView extends WebView implements WebViewJavascriptBridge {
 		if (!TextUtils.isEmpty(handlerName)) {
 			m.setHandlerName(handlerName);
 		}
-		queueMessage(m);
-	}
-
-	/**
-	 * list<message> != null 添加到消息集合否则分发消息
-	 * @param m Message
-	 */
-	private void queueMessage(Message m) {
-		if (startupMessage != null) {
-			startupMessage.add(m);
-		} else {
-			dispatchMessage(m);
-		}
+        mStartupMessage.add(m);
 	}
 
 	/**
@@ -196,7 +184,7 @@ public class BridgeWebView extends WebView implements WebViewJavascriptBridge {
 										Message responseMsg = new Message();
 										responseMsg.setResponseId(callbackId);
 										responseMsg.setResponseData(data);
-										queueMessage(responseMsg);
+                                        mStartupMessage.add(responseMsg);
 									}
 								};
 							} else {

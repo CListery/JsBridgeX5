@@ -8,6 +8,7 @@ import com.yh.jsbridge.Message;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.ArrayList;
 
 /**
  * Created by bruce on 10/28/15.
@@ -50,14 +51,11 @@ public class X5BridgeWebViewClient extends WebViewClient {
         if (X5BridgeWebView.toLoadJs != null) {
             X5BridgeUtil.webViewLoadLocalJs(view, X5BridgeWebView.toLoadJs);
         }
-
-        //
-        if (webView.getStartupMessage() != null) {
-            for (Message m : webView.getStartupMessage()) {
-                webView.dispatchMessage(m);
-            }
-            webView.setStartupMessage(null);
+    
+        for (Message m : new ArrayList<>(webView.getStartupMsg())) {
+            webView.dispatchMessage(m);
         }
+        webView.clearStartupMsg();
     }
 
     @Override
