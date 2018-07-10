@@ -5,17 +5,32 @@ android {
     defaultConfig {
         applicationId "com.yhcai.jsbridgex5"
         minSdkVersion 15
-        targetSdkVersion 27
+        targetSdkVersion 22
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        ndk { abiFilters "armeabi" }
     }
-    splits {
-        abi {
-            enable false
-            reset()
-            include 'armeabi'/*, 'armeabi-v7a','x86_64', 'x86'*/
-            universalApk true
+//    splits {
+//        abi {
+//            enable true
+//            reset()
+//            include 'armeabi-v7a'/*, 'armeabi','x86_64', 'x86'*/
+//            universalApk false
+//        }
+//    }
+    signingConfigs {//签名信息 可以自定义很多
+        release {
+            storeFile file("/work/signing_file/android.keystore")
+            storePassword "miracle*star"
+            keyAlias "android"
+            keyPassword "miracle*star"
+        }
+        debug {
+            storeFile file("/work/signing_file/android.keystore")
+            storePassword "miracle*star"
+            keyAlias "android"
+            keyPassword "miracle*star"
         }
     }
     sourceSets {
@@ -26,13 +41,21 @@ android {
     buildTypes {
         release {
             minifyEnabled false
+            debuggable true
+            signingConfig signingConfigs.release
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            minifyEnabled false
+            debuggable true
+            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
 }
 
-repositories{
-    flatDir{
+repositories {
+    flatDir {
         dirs '../library/libs'
     }
 }
@@ -46,5 +69,5 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     implementation project(':library')
 //    implementation files('/work/workspaces/JsBridgeX5/library/libs/tbs_sdk.jar')
-    implementation(name:'tbsplus_3.6.0.1248_43611_sharewithdownload_withoutGame_obfs',ext:'aar')
+    implementation(name: 'tbsplus_3.6.0.1248_43611_sharewithdownload_withoutGame_obfs', ext: 'aar')
 }

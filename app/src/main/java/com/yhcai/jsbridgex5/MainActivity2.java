@@ -1,7 +1,6 @@
 package com.yhcai.jsbridgex5;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -42,14 +41,13 @@ public class MainActivity2 extends AppCompatActivity {
         
         mWebView.setWebViewClient(new X5BridgeWebViewClient(mWebView) {
             @Override
-            public void onPageStarted(WebView webView, String s, Bitmap bitmap) {
-                super.onPageStarted(webView, s, bitmap);
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
                 callJS();
             }
         });
         
         mWebView.loadUrl("file:///android_asset/demo.html");
-        
     }
     
     private void callJS() {

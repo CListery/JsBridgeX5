@@ -1,42 +1,42 @@
 <html>
-    <head>
-        <meta content="text/html; charset=utf-8" http-equiv="content-type">
-        <title>
-            js调用java
-        </title>
-    </head>
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type">
+    <title>
+        js调用java
+    </title>
+</head>
 
-    <body>
-        <p>
-            <xmp id="show">
-            </xmp>
-        </p>
-        <p>
-            <xmp id="init">
-            </xmp>
-        </p>
-        <p>
-            <input type="text" id="text1" value="username" />
-        </p>
-        <p>
-            <input type="text" id="text2" value="address" />
-        </p>
-        <p>
-            <input type="button" id="enter" value="AutoInput" onclick="testClick();"
-            />
-        </p>
-        <p>
-            <input type="button" id="enter1" value="调用Native方法" onclick="testClick1();"
-            />
-        </p>
-        <p>
-            <input type="button" id="enter2" value="显示html" onclick="testDiv();" />
-        </p>
-        <p>
-            <input type="file" value="打开文件" />
-        </p>
-    </body>
-    <script>
+<body>
+<p>
+    <xmp id="show">
+    </xmp>
+</p>
+<p>
+    <xmp id="init">
+    </xmp>
+</p>
+<p>
+    <input type="text" id="text1" value="username"/>
+</p>
+<p>
+    <input type="text" id="text2" value="address"/>
+</p>
+<p>
+    <input type="button" id="enter" value="AutoInput" onclick="testClick();"
+    />
+</p>
+<p>
+    <input type="button" id="enter1" value="调用Native方法" onclick="testClick1();"
+    />
+</p>
+<p>
+    <input type="button" id="enter2" value="显示html" onclick="testDiv();"/>
+</p>
+<p>
+    <input type="file" value="打开文件"/>
+</p>
+</body>
+<script>
         function testDiv() {
             document.getElementById("show").innerHTML = document.getElementsByTagName("html")[0].innerHTML;
         }
@@ -112,7 +112,9 @@
                 document.getElementById("text2").value = obj.address;
             });
         })
-    </script>
+
+
+</script>
 
 </html>
 

@@ -22,7 +22,7 @@ public class BridgeWebViewClient extends WebViewClient {
     private BridgeWebView webView;
     
     private AtomicBoolean mLoaded = new AtomicBoolean(Boolean.FALSE);
-
+    
     public BridgeWebViewClient(BridgeWebView webView) {
         this.webView = webView;
     }
@@ -35,7 +35,7 @@ public class BridgeWebViewClient extends WebViewClient {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-
+        
         if (url.startsWith(BridgeUtil.YY_RETURN_DATA)) { // 如果是返回数据
             webView.handlerReturnData(url);
             return true;
@@ -46,12 +46,12 @@ public class BridgeWebViewClient extends WebViewClient {
             return super.shouldOverrideUrlLoading(view, url);
         }
     }
-
+    
     // 增加shouldOverrideUrlLoading在api》=24时
     @CallSuper
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-
+        
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             String url = request.getUrl().toString();
             try {
@@ -68,11 +68,11 @@ public class BridgeWebViewClient extends WebViewClient {
             } else {
                 return super.shouldOverrideUrlLoading(view, request);
             }
-        }else {
+        } else {
             return super.shouldOverrideUrlLoading(view, request);
         }
     }
-
+    
     @CallSuper
     @Override
     public void onPageStarted(WebView view, String url, Bitmap favicon) {
@@ -84,11 +84,11 @@ public class BridgeWebViewClient extends WebViewClient {
     @Override
     public void onPageFinished(WebView view, String url) {
         super.onPageFinished(view, url);
-    
+        
         BridgeUtil.webViewLoadLocalJs(view, BridgeWebView.toLoadJs);
-    
+        
         mLoaded.set(true);
-    
+        
         for (Message m : new ArrayList<>(webView.getStartupMsg())) {
             webView.dispatchMessage(m);
         }

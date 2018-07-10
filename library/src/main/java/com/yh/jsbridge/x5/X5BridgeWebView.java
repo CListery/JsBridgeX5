@@ -25,14 +25,14 @@ import java.util.Map;
 
 @SuppressLint("SetJavaScriptEnabled")
 public class X5BridgeWebView extends WebView implements WebViewJavascriptBridge {
-
+    
     private final String TAG = "BridgeWebView";
-
+    
     public static final String toLoadJs = "WebViewJavascriptBridge.js";
     Map<String, CallBackFunction> responseCallbacks = new HashMap<>();
     Map<String, BridgeHandler> messageHandlers = new HashMap<>();
     BridgeHandler defaultHandler = new DefaultHandler();
-
+    
     private List<Message> mStartupMessage = new ArrayList<>();
     
     private X5BridgeWebViewClient mProxyBridgeClient;
@@ -40,28 +40,28 @@ public class X5BridgeWebView extends WebView implements WebViewJavascriptBridge 
     public List<Message> getStartupMsg() {
         return mStartupMessage;
     }
-
+    
     public void clearStartupMsg() {
         mStartupMessage.clear();
     }
-
+    
     private long uniqueId = 0;
-
+    
     public X5BridgeWebView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
     }
-
+    
     public X5BridgeWebView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         init();
     }
-
+    
     public X5BridgeWebView(Context context) {
         super(context);
         init();
     }
-
+    
     /**
      * @param handler default handler,handle messages send by js without assigned handler name,
      *                if js message has handler name, it will be handled by named handlers registered by native
@@ -69,7 +69,7 @@ public class X5BridgeWebView extends WebView implements WebViewJavascriptBridge 
     public void setDefaultHandler(BridgeHandler handler) {
         this.defaultHandler = handler;
     }
-
+    
     private void init() {
         this.setVerticalScrollBarEnabled(false);
         this.setHorizontalScrollBarEnabled(false);
@@ -80,7 +80,7 @@ public class X5BridgeWebView extends WebView implements WebViewJavascriptBridge 
         mProxyBridgeClient = generateBridgeWebViewClient();
         this.setWebViewClient(generateBridgeWebViewClient());
     }
-
+    
     protected X5BridgeWebViewClient generateBridgeWebViewClient() {
         return new X5BridgeWebViewClient(this);
     }
@@ -109,37 +109,48 @@ public class X5BridgeWebView extends WebView implements WebViewJavascriptBridge 
             return;
         }
     }
-
+    
+    /**
+     * It is recommended to call this function after {@link WebViewClient#onPageFinished(WebView, String)}
+     */
     @Override
     public void send(String data) {
         send(data, null);
     }
-
+    
+    /**
+     * It is recommended to call this function after {@link WebViewClient#onPageFinished(WebView, String)}
+     */
     @Override
     public void send(String data, CallBackFunction responseCallback) {
         doSend(null, data, responseCallback);
     }
-
+    
     private void doSend(String handlerName, String data, CallBackFunction responseCallback) {
         Message m = new Message();
         if (!TextUtils.isEmpty(data)) {
             m.setData(data);
         }
         if (responseCallback != null) {
-            String callbackStr = String.format(X5BridgeUtil.CALLBACK_ID_FORMAT, ++uniqueId + (X5BridgeUtil.UNDERLINE_STR + SystemClock.currentThreadTimeMillis()));
+            String callbackStr = String.format(X5BridgeUtil.CALLBACK_ID_FORMAT,
+                    ++uniqueId + (X5BridgeUtil.UNDERLINE_STR + SystemClock.currentThreadTimeMillis()));
             responseCallbacks.put(callbackStr, responseCallback);
             m.setCallbackId(callbackStr);
         }
         if (!TextUtils.isEmpty(handlerName)) {
             m.setHandlerName(handlerName);
         }
+        queueMessage(m);
+    }
+    
+    private void queueMessage(Message m) {
         if (mProxyBridgeClient.isLoaded()) {
             dispatchMessage(m);
         } else {
             mStartupMessage.add(m);
         }
     }
-
+    
     void dispatchMessage(Message m) {
         String messageJson = m.toJson();
         //escape special characters for json string
@@ -150,11 +161,11 @@ public class X5BridgeWebView extends WebView implements WebViewJavascriptBridge 
             this.loadUrl(javascriptCommand);
         }
     }
-
+    
     void flushMessageQueue() {
         if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
             loadUrl(X5BridgeUtil.JS_FETCH_QUEUE_FROM_JAVA, new CallBackFunction() {
-
+                
                 @Override
                 public void onCallBack(String data) {
                     // deserializeMessage
@@ -214,12 +225,12 @@ public class X5BridgeWebView extends WebView implements WebViewJavascriptBridge 
             });
         }
     }
-
+    
     public void loadUrl(String jsUrl, CallBackFunction returnCallback) {
         this.loadUrl(jsUrl);
         responseCallbacks.put(X5BridgeUtil.parseFunctionName(jsUrl), returnCallback);
     }
-
+    
     /**
      * register handler,so that javascript can call it
      *
@@ -231,7 +242,7 @@ public class X5BridgeWebView extends WebView implements WebViewJavascriptBridge 
             messageHandlers.put(handlerName, handler);
         }
     }
-
+    
     /**
      * call javascript registered handler
      *
@@ -242,5 +253,5 @@ public class X5BridgeWebView extends WebView implements WebViewJavascriptBridge 
     public void callHandler(String handlerName, String data, CallBackFunction callBack) {
         doSend(handlerName, data, callBack);
     }
-
+    
 }

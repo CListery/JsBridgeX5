@@ -2,6 +2,6 @@
 <com.yh.jsbridge.x5.X5BridgeWebView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/web_view"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent" >
 
-</com.yh.jsbridge.x5.X5BridgeWebView>
+</com.yh.jsbridge.x5.X5BridgeWebView >

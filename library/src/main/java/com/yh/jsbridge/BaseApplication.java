@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -68,7 +69,7 @@ public class BaseApplication extends Application {
         if (!url.startsWith("http") && !url.startsWith("https") && !url.startsWith("file") && !url.startsWith("ftp")) {
             url = "http://" + url;
         }
-        Intent intent = new Intent(context, TbsPlusMainActivity.class);
+        final Intent intent = new Intent(context, TbsPlusMainActivity.class);
         Bundle bundle = new Bundle();
         bundle.putString("url", url);
         bundle.putInt("screenorientation", TbsPlus.eTBSPLUS_SCREENDIR.eTBSPLUS_SCREENDIR_SENSOR.ordinal());
@@ -80,6 +81,12 @@ public class BaseApplication extends Application {
             context.startActivity(intent);
         } finally {
             Toast.makeText(mInstance, "TBS load fail", Toast.LENGTH_SHORT).show();
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mInstance.sendBroadcast(new Intent(ACTION_RELOAD_URL));
+                }
+            }, 5000);
         }
     }
     

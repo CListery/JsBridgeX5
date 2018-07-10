@@ -32,7 +32,7 @@ public class X5BridgeWebViewClient extends WebViewClient {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-
+        
         if (url.startsWith(X5BridgeUtil.YY_RETURN_DATA)) { // 如果是返回数据
             webView.handlerReturnData(url);
             return true;
@@ -55,11 +55,11 @@ public class X5BridgeWebViewClient extends WebViewClient {
     @Override
     public void onPageFinished(WebView view, String url) {
         super.onPageFinished(view, url);
-    
+        
         X5BridgeUtil.webViewLoadLocalJs(view, X5BridgeWebView.toLoadJs);
-    
+        
         mLoaded.set(true);
-    
+        
         for (Message m : new ArrayList<>(webView.getStartupMsg())) {
             webView.dispatchMessage(m);
         }
