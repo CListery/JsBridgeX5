@@ -8,9 +8,11 @@ import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 import com.yh.jsbridge.BridgeHandler;
 import com.yh.jsbridge.CallBackFunction;
+import com.yh.jsbridge.CanNotUseAPI;
 import com.yh.jsbridge.DefaultHandler;
 import com.yh.jsbridge.Message;
 import com.yh.jsbridge.WebViewJavascriptBridge;
@@ -31,7 +33,8 @@ public class BridgeWebView extends WebView implements WebViewJavascriptBridge {
 	BridgeHandler defaultHandler = new DefaultHandler();
 
 	private List<Message> mStartupMessage = new ArrayList<>();
-
+	private BridgeWebViewClient mBridgeWebviewClient;
+	
 	public List<Message> getStartupMsg() {
 		return mStartupMessage;
 	}
@@ -74,14 +77,29 @@ public class BridgeWebView extends WebView implements WebViewJavascriptBridge {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 			WebView.setWebContentsDebuggingEnabled(true);
 		}
-		this.setWebViewClient(generateBridgeWebViewClient());
+		mBridgeWebviewClient = generateBridgeWebViewClient();
+		this.setWebViewClient(mBridgeWebviewClient);
 	}
 
 	protected BridgeWebViewClient generateBridgeWebViewClient() {
 		return new BridgeWebViewClient(this);
 	}
-
-	/**
+    
+    @Override
+    @Deprecated
+    public void setWebViewClient(WebViewClient webViewClient) {
+        throw new CanNotUseAPI("Can't call this method");
+    }
+    
+    public void setWebViewClient(BridgeWebViewClient webViewClient) {
+        if (null != mBridgeWebviewClient) {
+            webViewClient.setLoaded(mBridgeWebviewClient.isLoaded());
+        }
+        mBridgeWebviewClient = webViewClient;
+        super.setWebViewClient(webViewClient);
+    }
+    
+    /**
 	 * 获取到CallBackFunction data执行调用并且从数据集移除
 	 * @param url
 	 */
@@ -125,7 +143,11 @@ public class BridgeWebView extends WebView implements WebViewJavascriptBridge {
 		if (!TextUtils.isEmpty(handlerName)) {
 			m.setHandlerName(handlerName);
 		}
-        mStartupMessage.add(m);
+		if (mBridgeWebviewClient.isLoaded()) {
+			dispatchMessage(m);
+		} else {
+			mStartupMessage.add(m);
+		}
 	}
 
 	/**

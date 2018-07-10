@@ -9,8 +9,10 @@ import android.text.TextUtils;
 import android.util.AttributeSet;
 
 import com.tencent.smtt.sdk.WebView;
+import com.tencent.smtt.sdk.WebViewClient;
 import com.yh.jsbridge.BridgeHandler;
 import com.yh.jsbridge.CallBackFunction;
+import com.yh.jsbridge.CanNotUseAPI;
 import com.yh.jsbridge.DefaultHandler;
 import com.yh.jsbridge.Message;
 import com.yh.jsbridge.WebViewJavascriptBridge;
@@ -32,7 +34,9 @@ public class X5BridgeWebView extends WebView implements WebViewJavascriptBridge 
     BridgeHandler defaultHandler = new DefaultHandler();
 
     private List<Message> mStartupMessage = new ArrayList<>();
-
+    
+    private X5BridgeWebViewClient mProxyBridgeClient;
+    
     public List<Message> getStartupMsg() {
         return mStartupMessage;
     }
@@ -73,13 +77,28 @@ public class X5BridgeWebView extends WebView implements WebViewJavascriptBridge 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             WebView.setWebContentsDebuggingEnabled(true);
         }
+        mProxyBridgeClient = generateBridgeWebViewClient();
         this.setWebViewClient(generateBridgeWebViewClient());
     }
 
     protected X5BridgeWebViewClient generateBridgeWebViewClient() {
         return new X5BridgeWebViewClient(this);
     }
-
+    
+    @Override
+    @Deprecated
+    public void setWebViewClient(WebViewClient webViewClient) {
+        throw new CanNotUseAPI("Can't call this method");
+    }
+    
+    public void setWebViewClient(X5BridgeWebViewClient webViewClient) {
+        if (null != mProxyBridgeClient) {
+            webViewClient.setLoaded(mProxyBridgeClient.isLoaded());
+        }
+        mProxyBridgeClient = webViewClient;
+        super.setWebViewClient(webViewClient);
+    }
+    
     void handlerReturnData(String url) {
         String functionName = X5BridgeUtil.getFunctionFromReturnUrl(url);
         CallBackFunction f = responseCallbacks.get(functionName);
@@ -114,7 +133,11 @@ public class X5BridgeWebView extends WebView implements WebViewJavascriptBridge 
         if (!TextUtils.isEmpty(handlerName)) {
             m.setHandlerName(handlerName);
         }
-        mStartupMessage.add(m);
+        if (mProxyBridgeClient.isLoaded()) {
+            dispatchMessage(m);
+        } else {
+            mStartupMessage.add(m);
+        }
     }
 
     void dispatchMessage(Message m) {

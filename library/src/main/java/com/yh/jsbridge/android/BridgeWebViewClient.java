@@ -2,6 +2,7 @@ package com.yh.jsbridge.android;
 
 import android.graphics.Bitmap;
 import android.os.Build;
+import android.support.annotation.CallSuper;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -11,6 +12,7 @@ import com.yh.jsbridge.Message;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * 如果要自定义WebViewClient必须要集成此类
@@ -18,11 +20,14 @@ import java.util.ArrayList;
  */
 public class BridgeWebViewClient extends WebViewClient {
     private BridgeWebView webView;
+    
+    private AtomicBoolean mLoaded = new AtomicBoolean(Boolean.FALSE);
 
     public BridgeWebViewClient(BridgeWebView webView) {
         this.webView = webView;
     }
-
+    
+    @CallSuper
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
         try {
@@ -43,6 +48,7 @@ public class BridgeWebViewClient extends WebViewClient {
     }
 
     // 增加shouldOverrideUrlLoading在api》=24时
+    @CallSuper
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
 
@@ -67,22 +73,33 @@ public class BridgeWebViewClient extends WebViewClient {
         }
     }
 
+    @CallSuper
     @Override
     public void onPageStarted(WebView view, String url, Bitmap favicon) {
+        mLoaded.set(false);
         super.onPageStarted(view, url, favicon);
     }
-
+    
+    @CallSuper
     @Override
     public void onPageFinished(WebView view, String url) {
         super.onPageFinished(view, url);
-
-        if (BridgeWebView.toLoadJs != null) {
-            BridgeUtil.webViewLoadLocalJs(view, BridgeWebView.toLoadJs);
-        }
-
+    
+        BridgeUtil.webViewLoadLocalJs(view, BridgeWebView.toLoadJs);
+    
+        mLoaded.set(true);
+    
         for (Message m : new ArrayList<>(webView.getStartupMsg())) {
             webView.dispatchMessage(m);
         }
         webView.clearStartupMsg();
+    }
+    
+    public boolean isLoaded() {
+        return mLoaded.get();
+    }
+    
+    public void setLoaded(boolean loaded) {
+        mLoaded.set(loaded);
     }
 }

@@ -19,18 +19,18 @@ public class MainActivity extends AppCompatActivity {
             startActivity(new Intent(MainActivity.this, MainActivity2.class));
         }
     };
-
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         IntentFilter filter = new IntentFilter(BaseApplication.ACTION_RELOAD_URL);
         registerReceiver(mLoadReceiver, filter);
     }
-
+    
     @Override
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(mLoadReceiver);
     }
-
+    
 }

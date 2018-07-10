@@ -4,18 +4,36 @@ android {
     compileSdkVersion 27
     defaultConfig {
         applicationId "com.yhcai.jsbridgex5"
-        minSdkVersion 14
+        minSdkVersion 15
         targetSdkVersion 27
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
-
+    splits {
+        abi {
+            enable false
+            reset()
+            include 'armeabi'/*, 'armeabi-v7a','x86_64', 'x86'*/
+            universalApk true
+        }
+    }
+    sourceSets {
+        main {
+            jni.srcDirs = ['jni']
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+}
+
+repositories{
+    flatDir{
+        dirs '../library/libs'
     }
 }
 
@@ -27,5 +45,6 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     implementation project(':library')
-    implementation files('/work/workspaces/JsBridgeX5/library/libs/tbs_sdk.jar')
+//    implementation files('/work/workspaces/JsBridgeX5/library/libs/tbs_sdk.jar')
+    implementation(name:'tbsplus_3.6.0.1248_43611_sharewithdownload_withoutGame_obfs',ext:'aar')
 }

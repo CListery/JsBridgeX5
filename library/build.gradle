@@ -31,7 +31,17 @@ android {
     }
 }
 
+repositories{
+    flatDir{
+        dirs 'libs'
+    }
+}
+
 dependencies {
-//    implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation files('libs/tbs_sdk.jar')
+    //    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.android.support:design:27.1.1'
+    implementation 'com.android.support:support-vector-drawable:27.1.1'
+
+    implementation(name:'tbsplus_3.6.0.1248_43611_sharewithdownload_withoutGame_obfs',ext:'aar')
 }
